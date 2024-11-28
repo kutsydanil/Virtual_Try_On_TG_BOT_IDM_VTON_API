@@ -126,11 +126,11 @@ class TelegramHandler:
                 await self.send_message(update, "❌ Ошибка при загрузке файла.")
         
         except Exception as e:
-            logging.error(f"Ошибка: {e}")
+            logging.error(f"Error: {e}")
             await self.send_message(update, "❌ Произошла ошибка. Попробуйте снова.")
 
     async def poll_status(self, update: Update, task_id, context: ContextTypes.DEFAULT_TYPE) -> None:
-        max_attempts = 5
+        max_attempts = 2
         for attempt in range(max_attempts):
             await asyncio.sleep(12)
             try:
@@ -153,15 +153,21 @@ class TelegramHandler:
                         await self.send_message(update, "❌ Ошибка на стороне нейронки. Повторите позже.")
                         await self.show_catalog(update, context)
                         return
-            
-            except Exception as e:
-                logging.error(f"Ошибка при получении статуса: {e}")
-                await self.send_message(update, "❌ Не удалось получить статус. Повторная попытка...")
-        
-        await self.send_message(update, "❌ Максимальное количество попыток достигнуто. Попробуйте позже.")
 
+            except Exception as e:
+                logging.error(f"Error with status image: {e}")
+                await self.send_message(update, "❌ Не удалось получить статус. Повторная попытка...")
+    
+        await self.send_message(update, "❌ Максимальное количество попыток достигнуто. Попробуйте позже.")
+        await asyncio.sleep(3)
+        await self.show_catalog(update, context)
+        
     async def show_catalog(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         current_index = context.user_data.get('current_product_index', 0)
+
+        if current_index < 0 or current_index >= len(self.products):
+            await self.send_message(update, "❌ Продукт не найден.")
+            return
 
         product = self.products[current_index]
         product_text = (
@@ -172,12 +178,21 @@ class TelegramHandler:
         )
         
         keyboard = self.get_product_keyboard()
-        await update.callback_query.message.reply_photo(
-            photo=product.image_url,
-            caption=product_text,
-            reply_markup=keyboard,
-            parse_mode=ParseMode.MARKDOWN_V2
-        )
+
+        if update.callback_query and update.callback_query.message:
+            await update.callback_query.message.reply_photo(
+                photo=product.image_url,
+                caption=product_text,
+                reply_markup=keyboard,
+                parse_mode=ParseMode.MARKDOWN_V2
+            )
+        else:
+            await update.message.reply_photo(
+                photo=product.image_url,
+                caption=product_text,
+                reply_markup=keyboard,
+                parse_mode=ParseMode.MARKDOWN_V2
+            )
 
     def get_product_keyboard(self):
         keyboard = [

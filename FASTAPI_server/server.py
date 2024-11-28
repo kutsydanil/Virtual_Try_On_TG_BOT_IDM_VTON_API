@@ -10,8 +10,9 @@ import logging
 from config import Config
 import base64
 
-UPLOAD_DIR = '/uploads'
-PROCESSED_DIR = '/processed'
+BASE_DIR = os.path.dirname(os.path.abspath(__file__)) 
+UPLOAD_DIR = os.path.join(BASE_DIR, 'uploads')
+PROCESSED_DIR = os.path.join(BASE_DIR, 'processed')
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 os.makedirs(PROCESSED_DIR, exist_ok=True)
 
@@ -80,8 +81,7 @@ async def process_files(task_id: str, user_photo_path: str, product_image_path: 
         if not os.path.exists(product_image_path):
             processing_results[task_id] = {'status': 'error', 'message': f"File {product_image_path} not found."}
             return
-        print("Тут")
-        pass
+
         result_gradio = await asyncio.to_thread(gradio_client.predict,
             dict={"background": file(user_photo_path)},
             garm_img=file(product_image_path),

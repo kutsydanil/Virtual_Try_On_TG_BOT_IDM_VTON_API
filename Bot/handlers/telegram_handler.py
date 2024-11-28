@@ -131,7 +131,7 @@ class TelegramHandler:
 
     async def poll_status(self, update: Update, task_id, context: ContextTypes.DEFAULT_TYPE) -> None:
         max_attempts = 2
-        for attempt in range(max_attempts):
+        for _ in range(max_attempts):
             await asyncio.sleep(12)
             try:
                 async with httpx.AsyncClient() as client:

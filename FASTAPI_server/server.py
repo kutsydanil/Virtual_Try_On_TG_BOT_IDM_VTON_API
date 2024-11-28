@@ -92,6 +92,7 @@ async def process_files(task_id: str, user_photo_path: str, product_image_path: 
             seed=42,
             api_name="/tryon"
         )
+        
         image_path = result_gradio[0]
         with open(image_path, "rb") as img_file:
             processed_image_data = img_file.read()

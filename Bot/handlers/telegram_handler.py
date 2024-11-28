@@ -32,12 +32,13 @@ class TelegramHandler:
         }
 
     async def start_menu(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        if not self.products:
+            self.products = await self.product_service.fetch_products()
+
         context.user_data['current_product_index'] = 0
-        self.products = await self.product_service.fetch_products()
 
         if not self.products:
-            await self.send_message(update, "❌ Не удалось получить список товаров. Попробуйте позже.")
-            return
+            await update.message.reply_text("❌ Ассортимент не найдены. Пожалуйста, попробуйте позже.")
 
         welcome_text = (
             "👋 Привет! Я ваш помощник в онлайн-магазине.\n"
@@ -130,8 +131,8 @@ class TelegramHandler:
             await self.send_message(update, "❌ Произошла ошибка. Попробуйте снова.")
 
     async def poll_status(self, update: Update, task_id, context: ContextTypes.DEFAULT_TYPE) -> None:
-        max_attempts = 2
-        for _ in range(max_attempts):
+        processing = True
+        while processing:
             await asyncio.sleep(12)
             try:
                 async with httpx.AsyncClient() as client:
@@ -140,29 +141,30 @@ class TelegramHandler:
                     status_data = status_response.json()
 
                     if status_data['status'] == 'completed':
-                        await self.send_message(update, "✅ Обработка завершена!")
                         processed_image_base64 = status_data['result']
                         img_bytes = base64.b64decode(processed_image_base64)
                         await update.message.reply_photo(photo=img_bytes)
                         await asyncio.sleep(3)
+                        await self.send_message(update, "✅ Status: Обработка завершена!")
                         await self.show_catalog(update, context)
-                        return
+                        processing = False
 
-                    elif status_data['status'] == 'processing':
-                        await self.send_message(update, "⏳ Обработка продолжается...")
-                    else:
-                        await self.send_message(update, "❌ Ошибка на стороне нейронки. Повторите позже.")
+                    elif status_data['status'] == 'error':
+                        await self.send_message(update, "❌ Status: Ошибка на стороне IDM-VTON API. Повторите позже.")
                         await asyncio.sleep(3)
                         await self.show_catalog(update, context)
-                        return
+                        processing = False
+                    else:
+                        await self.send_message(update, "⏳ Status: в обоработке...")
 
+            except httpx.RequestError as e:
+                logging.error(f"Request error while checking status for task {task_id}: {e}")
+                await self.send_message(update, "❌ Status: Ошибка при получении статуса. Повторите позже.")
+                processing = False
             except Exception as e:
-                logging.error(f"Error with status image: {e}")
-                await self.send_message(update, "❌ Не удалось получить статус. Повторная попытка...")
-    
-        await self.send_message(update, "❌ Максимальное количество попыток достигнуто. Попробуйте позже.")
-        await asyncio.sleep(3)
-        await self.show_catalog(update, context)
+                logging.error(f"Unexpected error for task {task_id}: {e}")
+                await self.send_message(update, "❌ Status: Неизвестная ошибка. Повторите позже.")
+                processing = False
         
     async def show_catalog(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         current_index = context.user_data.get('current_product_index', 0)

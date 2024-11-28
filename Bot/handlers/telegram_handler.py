@@ -144,6 +144,7 @@ class TelegramHandler:
                         processed_image_base64 = status_data['result']
                         img_bytes = base64.b64decode(processed_image_base64)
                         await update.message.reply_photo(photo=img_bytes)
+                        await asyncio.sleep(3)
                         await self.show_catalog(update, context)
                         return
 
@@ -151,6 +152,7 @@ class TelegramHandler:
                         await self.send_message(update, "⏳ Обработка продолжается...")
                     else:
                         await self.send_message(update, "❌ Ошибка на стороне нейронки. Повторите позже.")
+                        await asyncio.sleep(3)
                         await self.show_catalog(update, context)
                         return
 

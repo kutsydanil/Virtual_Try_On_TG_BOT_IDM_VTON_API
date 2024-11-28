@@ -17,7 +17,8 @@ def main() -> None:
     upload_service = UploadService(config.fastapi_upload_url)
     
     telegram_handler = TelegramHandler(product_service=product_service, 
-                                       upload_service=upload_service, base_url_api=config.api_base_url)
+                                       upload_service=upload_service, 
+                                       base_url_api=config.api_base_url)
 
     application.add_handler(CommandHandler("start", telegram_handler.start_menu))
     application.add_handler(CommandHandler("help", telegram_handler.help_command))

@@ -68,9 +68,6 @@ async def upload_file(
         logging.error("Loading files server error: %s", e)
         return JSONResponse(content={"error": "Loading files server error."}, status_code=500)
 
-
-
-
 async def process_files(task_id: str, user_photo_path: str, product_image_path: str,
                         product_description: str):
     processing_results[task_id] = {'status': 'processing'}
@@ -83,7 +80,8 @@ async def process_files(task_id: str, user_photo_path: str, product_image_path: 
         if not os.path.exists(product_image_path):
             processing_results[task_id] = {'status': 'error', 'message': f"File {product_image_path} not found."}
             return
-        
+        print("Тут")
+        pass
         result_gradio = await asyncio.to_thread(gradio_client.predict,
             dict={"background": file(user_photo_path)},
             garm_img=file(product_image_path),
@@ -94,12 +92,11 @@ async def process_files(task_id: str, user_photo_path: str, product_image_path: 
             seed=42,
             api_name="/tryon"
         )
-        print(result_gradio)
-        print(result_gradio[0])
-        with open(result_gradio[0], "rb") as img_file:
+        image_path = result_gradio[0]
+        with open(image_path, "rb") as img_file:
             processed_image_data = img_file.read()
-            print(processed_image_data)
-        processed_image_extension = os.path.splitext(processed_image_data)[1]
+
+        processed_image_extension = os.path.splitext(image_path)[1]
         processed_image_base64 = base64.b64encode(processed_image_data).decode('utf-8')
 
         final_processed_image_path = os.path.join(PROCESSED_DIR, f"{task_id}_result{processed_image_extension}")

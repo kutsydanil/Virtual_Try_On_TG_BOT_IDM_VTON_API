@@ -79,7 +79,7 @@ class TelegramHandler:
         await self.send_message(update, help_text, keyboard)
 
     def get_help_menu_keyboard(self):
-        """Creates and returns the help menu keyboard for the Telegram bot.""""
+        """Creates and returns the help menu keyboard for the Telegram bot."""
         keyboard = [
             [InlineKeyboardButton("🔙 В меню", callback_data='return_to_menu')],
             [InlineKeyboardButton("📸 Как отправить изображение?", callback_data='how_to_send_photo')],

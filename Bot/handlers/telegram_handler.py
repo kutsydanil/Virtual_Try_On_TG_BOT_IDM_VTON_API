@@ -32,6 +32,7 @@ class TelegramHandler:
         }
 
     async def start_menu(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        """Initializes the start menu for the Telegram bot of the online store assistant."""
         if not self.products:
             self.products = await self.product_service.fetch_products()
 
@@ -50,6 +51,7 @@ class TelegramHandler:
         await self.send_message(update, welcome_text, keyboard)
 
     async def send_message(self, update: Update, text: str, reply_markup=None):
+        """Sends a message to the user, either in response to a callback query or as a regular message."""
         if update.callback_query:
             await update.callback_query.answer()
             await update.callback_query.message.reply_text(text, reply_markup=reply_markup)
@@ -57,6 +59,7 @@ class TelegramHandler:
             await update.message.reply_text(text, reply_markup=reply_markup)
 
     def get_main_menu_keyboard(self):
+        """Returns the main menu keyboard."""
         keyboard = [
             [InlineKeyboardButton("🔄 Начать", callback_data='show_catalog')],
             [InlineKeyboardButton("❓ Помощь", callback_data='help')]
@@ -64,6 +67,7 @@ class TelegramHandler:
         return InlineKeyboardMarkup(keyboard)
 
     async def help_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Handles the help command by providing information about the bot's functionalities and sending a help message with options."""
         keyboard = self.get_help_menu_keyboard()
         help_text = (
             "👋 Привет! Я ваш помощник в онлайн-магазине.\n"
@@ -75,6 +79,7 @@ class TelegramHandler:
         await self.send_message(update, help_text, keyboard)
 
     def get_help_menu_keyboard(self):
+        """Creates and returns the help menu keyboard for the Telegram bot.""""
         keyboard = [
             [InlineKeyboardButton("🔙 В меню", callback_data='return_to_menu')],
             [InlineKeyboardButton("📸 Как отправить изображение?", callback_data='how_to_send_photo')],
@@ -83,9 +88,11 @@ class TelegramHandler:
         return InlineKeyboardMarkup(keyboard)
 
     async def how_to_send_photo(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Instructs the user on how to send a photo for processing."""
         await self.send_message(update, "📸 Чтобы отправить изображение, выберите продукт и отправьте фото в формате JPG или PNG.")
 
     async def handle_list_of_products(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Handles the request to list available products."""
         if not self.products:
             await self.send_message(update, "❌ Не удалось получить список товаров.")
             return
@@ -94,6 +101,7 @@ class TelegramHandler:
         await self.send_message(update, f"🛍️ Доступные товары:\n{product_list}")
 
     async def handle_photo(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        """Handles the reception and processing of a user's photo."""
         await self.send_message(update, "⏳ Получаю ваше изображение...")
         
         current_index = context.user_data.get('current_product_index', 0)
@@ -131,6 +139,7 @@ class TelegramHandler:
             await self.send_message(update, "❌ Произошла ошибка. Попробуйте снова.")
 
     async def poll_status(self, update: Update, task_id, context: ContextTypes.DEFAULT_TYPE) -> None:
+        """Polls the status of the image processing task and updates the user on the progress."""
         processing = True
         while processing:
             await asyncio.sleep(12)
@@ -167,6 +176,7 @@ class TelegramHandler:
                 processing = False
         
     async def show_catalog(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        """Displays the current product from the catalog to the user."""
         current_index = context.user_data.get('current_product_index', 0)
 
         if current_index < 0 or current_index >= len(self.products):
@@ -199,6 +209,7 @@ class TelegramHandler:
             )
 
     async def get_product_keyboard(self):
+        """Creates and returns the inline keyboard for product navigation in the Telegram bot."""
         keyboard = [
             [InlineKeyboardButton("◀️ Назад", callback_data='previous_product'),
              InlineKeyboardButton("▶️ Вперед", callback_data='next_product')],
@@ -208,18 +219,22 @@ class TelegramHandler:
         return InlineKeyboardMarkup(keyboard)
 
     async def next_product(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Advances the current product index to the next product in the list and displays it."""
         context.user_data['current_product_index'] = (context.user_data['current_product_index'] + 1) % len(self.products)
         await self.show_catalog(update, context)
 
     async def previous_product(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Moves the current product index to the previous product in the list and displays it."""
         context.user_data['current_product_index'] = (context.user_data['current_product_index'] - 1) % len(self.products)
         await self.show_catalog(update, context)
 
     async def select_product(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Selects the current product and prompts the user to send a photo for processing."""
         product = self.products[context.user_data['current_product_index']]
         await self.send_message(update, f"✅ Вы выбрали: {product.name}.\n*Теперь отправьте фото в jpeg/jpg/png*")
 
     async def handle_button_click(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        """Handles button click events from the inline keyboard and routes to the appropriate command."""
         query = update.callback_query.data
         await update.callback_query.answer()
 

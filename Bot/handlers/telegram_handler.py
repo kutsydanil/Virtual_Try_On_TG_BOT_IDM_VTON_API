@@ -198,7 +198,7 @@ class TelegramHandler:
                 parse_mode=ParseMode.MARKDOWN_V2
             )
 
-    def get_product_keyboard(self):
+    async def get_product_keyboard(self):
         keyboard = [
             [InlineKeyboardButton("◀️ Назад", callback_data='previous_product'),
              InlineKeyboardButton("▶️ Вперед", callback_data='next_product')],

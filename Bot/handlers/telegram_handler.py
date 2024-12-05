@@ -39,7 +39,11 @@ class TelegramHandler:
         context.user_data['current_product_index'] = 0
 
         if not self.products:
-            await update.message.reply_text("❌ Ассортимент не найдены. Пожалуйста, попробуйте позже.")
+            if update.message:
+                await update.message.reply_text("❌ Ассортимент не найдены. Пожалуйста, попробуйте позже.")
+            else:
+                await update.callback_query.message.reply_text("❌ Ассортимент не найдены. Пожалуйста, попробуйте позже.")
+            return 
 
         welcome_text = (
             "👋 Привет! Я ваш помощник в онлайн-магазине.\n"

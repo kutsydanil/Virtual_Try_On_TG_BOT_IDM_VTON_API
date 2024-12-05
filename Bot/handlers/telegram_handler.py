@@ -51,7 +51,7 @@ class TelegramHandler:
             "Нажмите |Начать|, чтобы начать, или |Помощь|, если у вас есть вопросы."
         )
 
-        keyboard = await self.get_main_menu_keyboard()
+        keyboard = self.get_main_menu_keyboard()
         await self.send_message(update, welcome_text, keyboard)
 
     async def send_message(self, update: Update, text: str, reply_markup=None):

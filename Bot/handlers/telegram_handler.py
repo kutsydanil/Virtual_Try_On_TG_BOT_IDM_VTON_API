@@ -68,7 +68,7 @@ class TelegramHandler:
             [InlineKeyboardButton("🔄 Начать", callback_data='show_catalog')],
             [InlineKeyboardButton("❓ Помощь", callback_data='help')]
         ]
-        return InlineKeyboardMarkup(keyboard)
+        return await InlineKeyboardMarkup(keyboard)
 
     async def help_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handles the help command by providing information about the bot's functionalities and sending a help message with options."""
@@ -89,7 +89,7 @@ class TelegramHandler:
             [InlineKeyboardButton("📸 Как отправить изображение?", callback_data='how_to_send_photo')],
             [InlineKeyboardButton("🛍️ Список товаров", callback_data='list_of_products')],
         ]
-        return InlineKeyboardMarkup(keyboard)
+        return await InlineKeyboardMarkup(keyboard)
 
     async def how_to_send_photo(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Instructs the user on how to send a photo for processing."""

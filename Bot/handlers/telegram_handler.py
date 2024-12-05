@@ -51,7 +51,7 @@ class TelegramHandler:
             "Нажмите |Начать|, чтобы начать, или |Помощь|, если у вас есть вопросы."
         )
 
-        keyboard = self.get_main_menu_keyboard()
+        keyboard = await self.get_main_menu_keyboard()
         await self.send_message(update, welcome_text, keyboard)
 
     async def send_message(self, update: Update, text: str, reply_markup=None):
@@ -72,7 +72,7 @@ class TelegramHandler:
 
     async def help_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handles the help command by providing information about the bot's functionalities and sending a help message with options."""
-        keyboard = self.get_help_menu_keyboard()
+        keyboard = await self.get_help_menu_keyboard()
         help_text = (
             "👋 Привет! Я ваш помощник в онлайн-магазине.\n"
             "Вот что я могу:\n"

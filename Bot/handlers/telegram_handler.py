@@ -58,7 +58,7 @@ class TelegramHandler:
         else:
             await update.message.reply_text(text, reply_markup=reply_markup)
 
-    def get_main_menu_keyboard(self):
+    async def get_main_menu_keyboard(self):
         """Returns the main menu keyboard."""
         keyboard = [
             [InlineKeyboardButton("🔄 Начать", callback_data='show_catalog')],
@@ -78,7 +78,7 @@ class TelegramHandler:
         )
         await self.send_message(update, help_text, keyboard)
 
-    def get_help_menu_keyboard(self):
+    async def get_help_menu_keyboard(self):
         """Creates and returns the help menu keyboard for the Telegram bot."""
         keyboard = [
             [InlineKeyboardButton("🔙 В меню", callback_data='return_to_menu')],

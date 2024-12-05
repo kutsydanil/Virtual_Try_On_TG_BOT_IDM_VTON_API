@@ -72,7 +72,7 @@ class TelegramHandler:
 
     async def help_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handles the help command by providing information about the bot's functionalities and sending a help message with options."""
-        keyboard = await self.get_help_menu_keyboard()
+        keyboard = self.get_help_menu_keyboard()
         help_text = (
             "👋 Привет! Я ваш помощник в онлайн-магазине.\n"
             "Вот что я могу:\n"
@@ -195,7 +195,7 @@ class TelegramHandler:
             f"📜 *Описание:* {escape_special_chars(product.description)}\n"
         )
         
-        keyboard = await self.get_product_keyboard()
+        keyboard = self.get_product_keyboard()
 
         if update.callback_query and update.callback_query.message:
             await update.callback_query.message.reply_photo(
@@ -212,7 +212,7 @@ class TelegramHandler:
                 parse_mode=ParseMode.MARKDOWN_V2
             )
 
-    async def get_product_keyboard(self):
+    def get_product_keyboard(self):
         """Creates and returns the inline keyboard for product navigation in the Telegram bot."""
         keyboard = [
             [InlineKeyboardButton("◀️ Назад", callback_data='previous_product'),

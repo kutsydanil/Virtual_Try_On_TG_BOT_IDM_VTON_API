@@ -39,11 +39,7 @@ class TelegramHandler:
         context.user_data['current_product_index'] = 0
 
         if not self.products:
-            if update.message:
-                await update.message.reply_text("❌ Ассортимент не найдены. Пожалуйста, попробуйте позже.")
-            else:
-                await update.callback_query.message.reply_text("❌ Ассортимент не найдены. Пожалуйста, попробуйте позже.")
-            return 
+            await update.message.reply_text("❌ Ассортимент не найдены. Пожалуйста, попробуйте позже.")
 
         welcome_text = (
             "👋 Привет! Я ваш помощник в онлайн-магазине.\n"
@@ -62,7 +58,7 @@ class TelegramHandler:
         else:
             await update.message.reply_text(text, reply_markup=reply_markup)
 
-    async def get_main_menu_keyboard(self):
+    def get_main_menu_keyboard(self):
         """Returns the main menu keyboard."""
         keyboard = [
             [InlineKeyboardButton("🔄 Начать", callback_data='show_catalog')],
@@ -82,7 +78,7 @@ class TelegramHandler:
         )
         await self.send_message(update, help_text, keyboard)
 
-    async def get_help_menu_keyboard(self):
+    def get_help_menu_keyboard(self):
         """Creates and returns the help menu keyboard for the Telegram bot."""
         keyboard = [
             [InlineKeyboardButton("🔙 В меню", callback_data='return_to_menu')],

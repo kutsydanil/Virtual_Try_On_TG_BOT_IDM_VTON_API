@@ -62,13 +62,13 @@ class TelegramHandler:
         else:
             await update.message.reply_text(text, reply_markup=reply_markup)
 
-    async def get_main_menu_keyboard(self):
+    def get_main_menu_keyboard(self):
         """Returns the main menu keyboard."""
         keyboard = [
             [InlineKeyboardButton("🔄 Начать", callback_data='show_catalog')],
             [InlineKeyboardButton("❓ Помощь", callback_data='help')]
         ]
-        return await InlineKeyboardMarkup(keyboard)
+        return InlineKeyboardMarkup(keyboard)
 
     async def help_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Handles the help command by providing information about the bot's functionalities and sending a help message with options."""
@@ -82,14 +82,14 @@ class TelegramHandler:
         )
         await self.send_message(update, help_text, keyboard)
 
-    async def get_help_menu_keyboard(self):
+    def get_help_menu_keyboard(self):
         """Creates and returns the help menu keyboard for the Telegram bot."""
         keyboard = [
             [InlineKeyboardButton("🔙 В меню", callback_data='return_to_menu')],
             [InlineKeyboardButton("📸 Как отправить изображение?", callback_data='how_to_send_photo')],
             [InlineKeyboardButton("🛍️ Список товаров", callback_data='list_of_products')],
         ]
-        return await InlineKeyboardMarkup(keyboard)
+        return InlineKeyboardMarkup(keyboard)
 
     async def how_to_send_photo(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Instructs the user on how to send a photo for processing."""
